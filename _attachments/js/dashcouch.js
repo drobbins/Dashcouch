@@ -44,10 +44,19 @@
     load : function () {
       var that = this
         , ddoc = this.model.get("ddoc");
+
       $db.openDoc(ddoc, { success : function (doc){
         that.model.set("doc", doc);
-        $(".content").html(doc.dashapp.tabs.main);
+        if ( doc.dashapp.js && doc.dashapp.js.main ){
+          var main = doc.dashapp.js.main;
+          main = new Function("app", main.match(/{([\S\s]+)}/)[1]);
+          main(that.model);
+        }
+        else if ( doc.dashapp.tabs && doc.dashapp.tabs.main ) {
+          $(".content").html(doc.dashapp.tabs.main);
+        }
       }});
+
     }
 
   });
