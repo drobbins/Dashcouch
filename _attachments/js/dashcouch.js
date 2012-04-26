@@ -2,22 +2,28 @@
 
   var global = this;
 
-  var App, AppList, AppView, AppListView, $db;
+  var App, AppList, AppView, AppListView, $db, Dashcouch = {},
+      dbName, ddocName, fragments;
 
-  $db = $.couch.db("dashcouch");
+  fragments = unescape(document.location.href).split('/');
+  dbName = fragments[3];
+  ddocName = fragments[5];
 
-  App = Backbone.Model.extend({
+  Dashcouch.$db = $db = $.couch.db(dbName);
+  Dashcouch.ddoc = ddocName;
+
+  Dashcouch.App = App = Backbone.Model.extend({
     defaults : {
       name : "App",
       ddoc : {}
     }
   });
 
-  AppList = Backbone.Collection.extend({
+  Dashcouch.AppList = AppList = Backbone.Collection.extend({
     model : App
   });
 
-  AppView = Backbone.View.extend({
+  Dashcouch.AppView = AppView = Backbone.View.extend({
 
     tagName : "li",
 
@@ -43,17 +49,29 @@
 
     load : function () {
       var that = this
-        , ddoc = this.model.get("ddoc");
+        , ddoc = this.model.get("ddoc")
+        , name = this.model.get("name");
 
       $db.openDoc(ddoc, { success : function (doc){
         that.model.set("doc", doc);
-        if ( doc.dashapp.js && doc.dashapp.js.main ){
+        Dashcouch.Apps = Dashcouch.Apps || {};
+        Dashcouch.Apps[name] = {
+          app : that.model
+        };
+        if ( doc.run ) {
+          var uri = "../"+name+doc.run, s;
+          s = document.createElement("script");
+          s.src = uri;
+          document.body.appendChild(s);
+          //document.body.write('<script src="'+uri+'"><\/script>')
+        }
+        else if ( doc.dashapp.js && doc.dashapp.js.main ){
           var main = doc.dashapp.js.main;
           main = new Function("app", main.match(/{([\S\s]+)}/)[1]);
           main(that.model);
         }
-        else if ( doc.dashapp.tabs && doc.dashapp.tabs.main ) {
-          $(".content").html(doc.dashapp.tabs.main);
+        else if ( doc.dashapp.templates && doc.dashapp.templates.main ) {
+          $(".content").html(doc.dashapp.templates.main);
         }
       }});
 
@@ -61,7 +79,7 @@
 
   });
 
-  AppListView = Backbone.View.extend({
+  Dashcouch.AppListView = AppListView = Backbone.View.extend({
 
     el : $(".app-menu"),
 
@@ -88,7 +106,9 @@
 
         _(data.rows).each(function (row) {
           var name = row.id.split("/")[1];
-          that.collection.add({ name : name, ddoc : row.id });
+          if (name !== "DashCouch") {
+            that.collection.add({ name : name, ddoc : row.id });
+          }
         });
 
         that.render();
@@ -98,5 +118,6 @@
 
   });
 
+  global.Dashcouch = global.Dashcouch || Dashcouch;
   global.AppListView = new AppListView();
 }());
