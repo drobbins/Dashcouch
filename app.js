@@ -42,7 +42,7 @@
 
   // To load a subdirectory: views : couchapp.loadFiles('./views', loadFileOptions)
   ddoc = { _id : '_design/DashCouch'
-    ,views : null
+    ,views : couchapp.loadFiles('./views', loadFileOptions)
     ,evently : null
     ,lists : null
     ,shows : null

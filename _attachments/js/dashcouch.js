@@ -12,6 +12,9 @@
   Dashcouch.$db = $db = $.couch.db(dbName);
   Dashcouch.ddoc = ddocName;
 
+  Backbone.couch_connector.config.db_name = dbName;
+  Backbone.couch_connector.config.ddoc_name = ddocName;
+
   Dashcouch.App = App = Backbone.Model.extend({
     defaults : {
       name : "App",

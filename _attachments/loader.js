@@ -16,5 +16,6 @@ app_load([ "/_utils/script/sha1.js"
   ,"js/d3.min.js"
   ,"js/d3.layout.min.js"
   ,"js/jquery.mustache.js" //my fixed version of mustache.js. Check for updates later.
+  ,"js/backbone-couchdb.js"
   ,"js/dashcouch.js"
 ])
