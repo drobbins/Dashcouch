@@ -47,7 +47,6 @@
     ,lists : null
     ,shows : null
     ,vendor : null
-    ,validate_doc_update : validateDocUpdate
   }
 
   loadAllAttachments(ddoc, __dirname);
